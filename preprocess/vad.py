@@ -6,7 +6,6 @@ import re
 from pydub import AudioSegment
 import pandas as pd
 
-# Applies the VAD algorithm to each file
 def run_vad(file_path):
 
     model = Model.from_pretrained(
@@ -23,7 +22,6 @@ def run_vad(file_path):
 
     return pipeline(file_path)
 
-# Apply the VAD algorithm to every file in a folder and create new ones without silences
 def vad_cut(file_path, cut_path):
     pauses = []
     if not os.path.exists(cut_path):
