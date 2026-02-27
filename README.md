@@ -38,7 +38,7 @@ At a high level (see Fig. 1 in the paper), the pipeline is:
   - `evaluate.py`: WER evaluation.
   - `test.py`: test-set evaluation (baseline + fine-tuned folds).
 - `base_wer.py`  
-  Computes baseline WER comparing `default`, `VAD`, and `no_repeat` (configured for small runs).
+  Computes baseline WER comparing `default`, `VAD`, and `no_repeat`.
 - `plots/`  
   Plot scripts (violin/strip plots) built from CSVs under `resultados/`.
 - `src/figures/fig1_methodology.png`  
