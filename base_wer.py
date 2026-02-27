@@ -16,7 +16,7 @@ if __name__ == '__main__':
     small  = 'openai/whisper-small'
     medium  = 'openai/whisper-medium'
     large  = 'openai/whisper-large'
-    models = [tiny, base]
+    models = [tiny, base, small, medium, large]
 
     results = {}
     for model in models:
