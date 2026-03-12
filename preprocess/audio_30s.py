@@ -71,75 +71,64 @@ def processCutDataset(originalPath, originalTranscriptionsPath, processedPath):
     if not os.path.exists(processedPath):
         os.makedirs(processedPath)
     
-    if originalTranscriptionsPath is None:
-        for filename in os.listdir(originalPath):
-            if filename.endswith('.wav'):
-                baseName = os.path.splitext(filename)[0]
-                audioPath = os.path.join(originalPath, baseName + '.wav')
-                
-                original_audio = AudioSegment.from_mp3(audioPath)
-                processedAudioPath = os.path.join(processedPath, baseName + '.wav')
-                audio = original_audio.set_frame_rate(16000).set_channels(1)
-                audio.export(processedAudioPath, format='wav')
-    else:
-        for filename in os.listdir(originalPath):
-            if filename.endswith('.wav'):
-                baseName = os.path.splitext(filename)[0]
-                audioPath = os.path.join(originalPath, baseName + '.wav')
-                transcriptionPath = os.path.join(originalTranscriptionsPath, baseName + '.cha')
-                                
-                original_audio = AudioSegment.from_mp3(audioPath)
-                audio = AudioSegment.empty()
+    for filename in os.listdir(originalPath):
+        if filename.endswith('.wav'):
+            baseName = os.path.splitext(filename)[0]
+            audioPath = os.path.join(originalPath, baseName + '.wav')
+            transcriptionPath = os.path.join(originalTranscriptionsPath, baseName + '.cha')
+                            
+            original_audio = AudioSegment.from_mp3(audioPath)
+            audio = AudioSegment.empty()
 
-                preprocessedTranscription, patientTimeStamps, transcriptionLines = preprocessTranscription(transcriptionPath)
-                
-                if len(original_audio) <= chunk_size_ms:      
-                    processedAudioPath = os.path.join(processedPath, baseName + '.wav')             
-                    processedTranscriptionPath = os.path.join(processedPath, baseName + '.txt')
-                    audioFileName = baseName + '.wav'
-                    with open(processedTranscriptionPath, 'w', encoding='utf-8') as f:
-                        f.write(preprocessedTranscription)
-                    for timestamp in patientTimeStamps:
+            preprocessedTranscription, patientTimeStamps, transcriptionLines = preprocessTranscription(transcriptionPath)
+            
+            if len(original_audio) <= chunk_size_ms:      
+                processedAudioPath = os.path.join(processedPath, baseName + '.wav')             
+                processedTranscriptionPath = os.path.join(processedPath, baseName + '.txt')
+                audioFileName = baseName + '.wav'
+                with open(processedTranscriptionPath, 'w', encoding='utf-8') as f:
+                    f.write(preprocessedTranscription)
+                for timestamp in patientTimeStamps:
+                    start_ms = int(timestamp[0])
+                    end_ms = int(timestamp[1])
+                    audio += original_audio[start_ms:end_ms]
+                audio = audio.set_frame_rate(16000).set_channels(1)
+                audio.export(processedAudioPath, format='wav')
+
+            else:
+                current_idx = 0
+                part = 0
+                while current_idx < len(patientTimeStamps):
+                    audio=AudioSegment.empty()
+                    transcription = ''
+                    chunk_ms = 0
+                    part_start_idx = current_idx
+
+                    while current_idx < len(patientTimeStamps):
+                        timestamp = patientTimeStamps[current_idx]
                         start_ms = int(timestamp[0])
                         end_ms = int(timestamp[1])
-                        audio += original_audio[start_ms:end_ms]
-                    audio = audio.set_frame_rate(16000).set_channels(1)
-                    audio.export(processedAudioPath, format='wav')
-
-                else:
-                    current_idx = 0
-                    part = 0
-                    while current_idx < len(patientTimeStamps):
-                        audio=AudioSegment.empty()
-                        transcription = ''
-                        chunk_ms = 0
-                        part_start_idx = current_idx
-
-                        while current_idx < len(patientTimeStamps):
-                            timestamp = patientTimeStamps[current_idx]
-                            start_ms = int(timestamp[0])
-                            end_ms = int(timestamp[1])
-                            if end_ms - start_ms > chunk_size_ms:
-                                current_idx+=1
-                                break
-                            if chunk_ms + (end_ms - start_ms) > chunk_size_ms:
-                                break
-                            chunk_ms += end_ms - start_ms
-                            audio+=original_audio[start_ms:end_ms]
-                            transcription+=transcriptionLines[current_idx].strip()+' '
+                        if end_ms - start_ms > chunk_size_ms:
                             current_idx+=1
+                            break
+                        if chunk_ms + (end_ms - start_ms) > chunk_size_ms:
+                            break
+                        chunk_ms += end_ms - start_ms
+                        audio+=original_audio[start_ms:end_ms]
+                        transcription+=transcriptionLines[current_idx].strip()+' '
+                        current_idx+=1
 
-                        if len(audio) > 0:
-                            processedAudioPath = os.path.join(processedPath, f'{baseName}_part{part}.wav')   
-                            processedTranscriptionPath = os.path.join(processedPath, f'{baseName}_part{part}.txt')
-                            with open(processedTranscriptionPath, 'w', encoding='utf-8') as f:
-                                f.write(transcription.strip())
+                    if len(audio) > 0:
+                        processedAudioPath = os.path.join(processedPath, f'{baseName}_part{part}.wav')   
+                        processedTranscriptionPath = os.path.join(processedPath, f'{baseName}_part{part}.txt')
+                        with open(processedTranscriptionPath, 'w', encoding='utf-8') as f:
+                            f.write(transcription.strip())
 
-                            audio = audio.set_frame_rate(16000).set_channels(1)
-                            audio.export(processedAudioPath, format='wav')
+                        audio = audio.set_frame_rate(16000).set_channels(1)
+                        audio.export(processedAudioPath, format='wav')
 
-                            part+=1
+                        part+=1
 
-                        else:
-                            if part_start_idx == current_idx:
-                                current_idx += 1
+                    else:
+                        if part_start_idx == current_idx:
+                            current_idx += 1
