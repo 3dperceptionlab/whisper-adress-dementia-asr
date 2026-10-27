@@ -1,5 +1,9 @@
 # Beyond Silence Stripping: Robust Whisper-Based ASR for Dementia Speech
 
+<p align="center">
+  <a href="https://link.springer.com/chapter/10.1007/978-3-032-29254-4_50"><img alt="SOCO" src="https://img.shields.io/badge/SOCO-2026-blue.svg"></a> 
+</p>
+
 This repository contains the code accompanying the paper **“Beyond Silence Stripping: Robust Whisper-Based ASR for Dementia Speech”**
 
 The goal is to **adapt / fine-tune OpenAI Whisper** for spontaneous speech produced by **older adults** (healthy controls) and **people with dementia**, addressing common failure modes in atypical speech such as **long pauses**, **repetitions**, and other disfluency markers. In the paper, the proposed approach reports **18.77% WER (5-fold CV validation)** and **19.52% WER (test)** on the **ADReSS** benchmark.
@@ -158,4 +162,13 @@ python test.py
 
 ## Citing
 
-If you use this code, please cite the accompanying paper.
+```bibtex
+@inproceedings{ramos2026beyond,
+  title={Beyond Silence Stripping: Robust Whisper-Based ASR for Dementia Speech},
+  author={Ramos-Sanchez, Gonzalo and Ortiz-Perez, David and Psarrou, Alexandra and Garcia-Rodriguez, Jose},
+  booktitle={International Conference on Soft Computing Models in Industrial and Environmental Applications},
+  pages={621--633},
+  year={2026},
+  organization={Springer}
+}
+```
